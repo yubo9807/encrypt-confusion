@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "exec": "rm -rf dist && ts-node src/main.ts",
+    "async": "rm -rf dist && ts-node src/async.ts",
     "multi": "rm -rf dist && ts-node src/multi.ts"
   },
   "keywords": [],

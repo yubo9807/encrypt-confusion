@@ -3,8 +3,8 @@ import { encrypt } from "./util";
 const filePath = process.argv[2];
 
 try {
-  encrypt(filePath).then(() => {
-    process.send(filePath);
+  encrypt(filePath).then(res => {
+    process.send(res);
     process.exit(0);
   })
 } catch (err) {

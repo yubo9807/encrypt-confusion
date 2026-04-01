@@ -49,14 +49,24 @@ export function copyFileEnsureSync(src: string, dest: string): void {
   copyFileSync(src, dest)
 }
 
+/**
+ * 得到 Promise 返回类型
+ */
+export type PromiseType<T> = T extends Promise<infer K> ? K : T
+// type Pt = PromiseType<Promise<string>>
 
+
+enum FileHandleType {
+  ENCRYPT = 'Encrypt',
+  COPY    = 'Copy'
+}
 /**
  * 加密文件
  * @param file 
  * @returns 
  */
 export function encrypt(file: string) {
-  return new Promise(resolve => {
+  return new Promise<{ type: FileHandleType; input: string; output: string }>(resolve => {
     const relativePath = relative(env.ORIGIN_DIR, file);
     const outputPath = join(__dirname, '..', env.OUTPUT_DIR, relativePath);
   
@@ -79,12 +89,12 @@ export function encrypt(file: string) {
         );
         const obfuscatedCode = result.getObfuscatedCode();
         writeFileEnsureSync(outputPath, obfuscatedCode);
-        resolve(file);
+        resolve({ type: FileHandleType.ENCRYPT, input: file, output: outputPath });
       })
       return;
     }
 
     copyFileEnsureSync(file, outputPath);
-    resolve(file);
+    resolve({ type: FileHandleType.COPY, input: file, output: outputPath });
   })
 }

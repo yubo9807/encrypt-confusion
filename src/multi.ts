@@ -3,13 +3,14 @@ import path from 'path';
 import { cpus } from 'os';
 import { getAllFilesSync } from './util';
 import env from './env';
+import type { encrypt, PromiseType } from './util';
 
 const files = getAllFilesSync(env.ORIGIN_DIR);
 const total = files.length;
 const MAX_CONCURRENT = cpus().length;
 let processedCount = 0;
 
-console.log(`共有 ${total} 个文件，最大并发数: ${MAX_CONCURRENT}`);
+console.log(`共 ${total} 个文件，最大并发数: ${MAX_CONCURRENT}`);
 
 function runNext() {
   if (files.length === 0) return;
@@ -18,11 +19,11 @@ function runNext() {
   // 启动子进程
   const child = fork(path.join(__dirname, 'worker.ts'), [file]);
 
-  child.on('message', file => {
+  child.on('message', (res: PromiseType<ReturnType<typeof encrypt>>) => {
     processedCount++;
-    console.log(`[${processedCount}:${total}] 加密完成：${file}`);
+      console.log(`[${processedCount}:${total}] ${res.type}: ${res.input}`);
     if (processedCount === total) {
-      console.log('所有文件处理完成！！！');
+      console.log('All done!');
       return;
     }
     runNext(); // 当前进程结束，立即启动下一个
