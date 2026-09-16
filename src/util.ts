@@ -67,8 +67,9 @@ enum FileHandleType {
  */
 export function encrypt(file: string) {
   return new Promise<{ type: FileHandleType; input: string; output: string }>(resolve => {
-    const relativePath = relative(env.ORIGIN_DIR, file);
-    const outputPath = join(__dirname, '..', env.OUTPUT_DIR, relativePath);
+    const relativePath = relative(path.resolve(env.ORIGIN_DIR), file);
+    const outputBase = path.isAbsolute(env.OUTPUT_DIR) ? env.OUTPUT_DIR : join(__dirname, '..', env.OUTPUT_DIR);
+    const outputPath = join(outputBase, relativePath);
   
     const ext = extname(file);
     if (ext === '.js') {
@@ -76,15 +77,15 @@ export function encrypt(file: string) {
         const result = JavaScriptObfuscator.obfuscate(
           code,
           {
-            vmObfuscation: true,
+            vmObfuscation: false,
             compact: true,
             controlFlowFlattening: true,
-            controlFlowFlatteningThreshold: 1,
-            numbersToExpressions: true,
+            controlFlowFlatteningThreshold: 0.1,
+            numbersToExpressions: false,
             simplify: true,
             stringArrayShuffle: true,
-            splitStrings: true,
-            stringArrayThreshold: 1
+            splitStrings: false,
+            stringArrayThreshold: 0.1,
           }
         );
         const obfuscatedCode = result.getObfuscatedCode();

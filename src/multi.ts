@@ -15,9 +15,10 @@ console.log(`共 ${total} 个文件，最大并发数: ${MAX_CONCURRENT}`);
 function runNext() {
   if (files.length === 0) return;
   const file = files.shift();  // 取出一个文件
+  if (typeof file === 'undefined') return;
 
   // 启动子进程
-  const child = fork(path.join(__dirname, 'worker.ts'), [file]);
+  const child = fork(path.join(__dirname, 'worker.ts'), [...process.argv.slice(2), file]);
 
   child.on('message', (res: PromiseType<ReturnType<typeof encrypt>>) => {
     processedCount++;

@@ -1,13 +1,13 @@
 import { encrypt } from "./util";
 
-const filePath = process.argv[2];
+const filePath = process.argv[process.argv.length - 1];
 
-try {
-  encrypt(filePath).then(res => {
-    process.send(res);
+encrypt(filePath)
+  .then(res => {
+    if (typeof process.send === 'function') process.send(res);
     process.exit(0);
   })
-} catch (err) {
-  console.error(err);
-  process.exit(1);
-}
+  .catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
